@@ -120,7 +120,7 @@ function App() {
       <header>
         <h1>UPLC Viewer</h1>
         <p>
-          Universal tool for inspecting and formatting Untyped Plutus Core (UPLC) in natively, flat encoded or CBOR-wrapped.
+          Universal tool for inspecting and formatting Untyped Plutus Core (UPLC): native, flat encoded or CBOR-wrapped.
         </p>
       </header>
 
