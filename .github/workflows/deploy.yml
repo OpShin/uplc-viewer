@@ -22,7 +22,7 @@ jobs:
       run:
         working-directory: webapp
     env:
-      VITE_BASE_PATH: ${{ endsWith(github.repository, '.github.io') && '/' || format('/{0}/', github.event.repository.name) }}
+      VITE_BASE_PATH: '/'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
