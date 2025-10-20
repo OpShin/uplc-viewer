@@ -6,6 +6,7 @@ import {
   defaultUplcVersion,
   parseUPLCText,
   prettyUPLC,
+  showUPLC,
 } from "@harmoniclabs/uplc";
 import { toHex, fromHex } from "@harmoniclabs/uint8array-utils";
 import type { UPLCTerm } from "@harmoniclabs/uplc";
@@ -14,6 +15,7 @@ export interface TextParseOutput {
   term: UPLCTerm;
   version: UPLCVersion;
   pretty: string;
+  compact: string;
 }
 
 export interface ProgramEncoding {
@@ -26,6 +28,7 @@ export interface ProgramEncoding {
 
 export interface CborParseOutput extends ProgramEncoding {
   pretty: string;
+  compact: string;
   version: UPLCVersion;
 }
 
@@ -62,8 +65,9 @@ export function parseTextSource(source: string): TextParseOutput {
     const term = parseUPLCText(source);
     const version = detectVersionFromSource(source);
     const pretty = prettyUPLC(term).trim();
+    const compact = showUPLC(term);
 
-    return { term, version, pretty };
+    return { term, version, pretty, compact };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error while parsing UPLC text.";
     throw new ParseError(message);
@@ -87,11 +91,13 @@ export function parseCborHex(input: string): CborParseOutput {
   try {
     const program = UPLCDecoder.parse(bytes, "cbor");
     const pretty = prettyUPLC(program.body).trim();
+    const compact = showUPLC(program.body);
     const encoding = encodeProgram(program.body, program.version);
 
     return {
       ...encoding,
       pretty,
+      compact,
       version: program.version,
     };
   } catch (error) {

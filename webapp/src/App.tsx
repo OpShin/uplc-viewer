@@ -8,6 +8,7 @@ interface ViewerResult {
   kind: SourceKind;
   version: string;
   pretty: string;
+  compact: string;
   flatHex: string;
   flatLength: number;
   cborHex: string;
@@ -21,6 +22,7 @@ function App() {
   const [result, setResult] = useState<ViewerResult | null>(EMPTY_RESULT);
   const [error, setError] = useState<string | null>(null);
   const [lastAction, setLastAction] = useState<string | null>(null);
+  const [prettyMode, setPrettyMode] = useState(false);
 
   const hasContent = input.trim().length > 0;
 
@@ -45,6 +47,7 @@ function App() {
     setResult(EMPTY_RESULT);
     setError(null);
     setLastAction(null);
+    setPrettyMode(false);
   };
 
   const handleProcess = () => {
@@ -68,6 +71,7 @@ function App() {
         kind: "text",
         version: versionToString(parsed.version),
         pretty: parsed.pretty,
+        compact: parsed.compact,
         flatHex: encoding.flatHex,
         flatLength: encoding.flatBytes.length,
         cborHex: encoding.cborHex,
@@ -85,6 +89,7 @@ function App() {
         kind: "cbor",
         version: versionToString(parsed.version),
         pretty: parsed.pretty,
+        compact: parsed.compact,
         flatHex: parsed.flatHex,
         flatLength: parsed.flatBytes.length,
         cborHex: parsed.cborHex,
@@ -155,8 +160,18 @@ function App() {
           <div className="output-block">
             <div className="output-header">
               <h2>Pretty UPLC</h2>
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={prettyMode}
+                  onChange={(event) => setPrettyMode(event.target.checked)}
+                />
+                <span>Pretty-print</span>
+              </label>
             </div>
-            <pre>{result.pretty}</pre>
+            <pre className={prettyMode ? "pretty" : "compact"}>
+              {prettyMode ? result.pretty : result.compact}
+            </pre>
           </div>
 
           <div className="output-block">
