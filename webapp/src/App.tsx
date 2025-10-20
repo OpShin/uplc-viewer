@@ -120,12 +120,7 @@ function App() {
       <header>
         <h1>UPLC Viewer</h1>
         <p>
-          Format Untyped Plutus Core or inspect its CBOR-wrapped variant in the browser—no backend
-          required. Explore more tooling at {" "}
-          <a href="https://opshin.dev" target="_blank" rel="noreferrer">
-            opshin.dev
-          </a>
-          .
+          Universal tool for inspecting and formatting Untyped Plutus Core (UPLC) in natively, flat encoded or CBOR-wrapped.
         </p>
       </header>
 
@@ -202,8 +197,9 @@ function App() {
 
       <footer>
         <p>
-          Powered by <code>@harmoniclabs/uplc</code>. Input is processed entirely in your browser.
-        </p>
+            Built by the <a href="https://opshin.dev" target="_blank" rel="noreferrer"><code>OpShin</code></a> team. Powered by <a href="https://github.com/HarmonicLabs/uplc"><code>@harmoniclabs/uplc</code></a>.
+          Compile Python to UPLC at the <a href="https://playground.opshin.dev" target="_blank" rel="noreferrer">OpShin Playground</a>.
+      </p>
       </footer>
     </div>
   );
