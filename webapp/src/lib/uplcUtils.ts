@@ -11,6 +11,8 @@ import {
 import { toHex, fromHex } from "@harmoniclabs/uint8array-utils";
 import type { UPLCTerm } from "@harmoniclabs/uplc";
 
+export type SourceKind = "text" | "cbor" | "flat";
+
 export interface TextParseOutput {
   term: UPLCTerm;
   version: UPLCVersion;
@@ -64,8 +66,8 @@ export function parseTextSource(source: string): TextParseOutput {
   try {
     const term = parseUPLCText(source);
     const version = detectVersionFromSource(source);
-    const pretty = prettyUPLC(term).trim();
-    const compact = showUPLC(term);
+    const pretty = wrapInProgram(prettyUPLC(term).trim(), version, true);
+    const compact = wrapInProgram(showUPLC(term), version, false);
 
     return { term, version, pretty, compact };
   } catch (error) {
@@ -85,13 +87,20 @@ export function encodeProgram(term: UPLCTerm, version: UPLCVersion): ProgramEnco
   return { program, flatBytes, flatHex, cborBytes, cborHex };
 }
 
+export function wrapInProgram(term: string, version: UPLCVersion = defaultUplcVersion, pretty: boolean = false): string {
+    if (pretty) {
+        return `(program ${version.toString()}\n  ${term.replace(/\n/g, "\n  ")}\n)`;
+    }
+   return `(program ${version.toString()} ${term})`;
+}
+
 export function parseCborHex(input: string): CborParseOutput {
   const bytes = hexStringToBytes(input);
 
   try {
     const program = UPLCDecoder.parse(bytes, "cbor");
-    const pretty = prettyUPLC(program.body).trim();
-    const compact = showUPLC(program.body);
+    const pretty = wrapInProgram(prettyUPLC(program.body).trim(), program.version, true);
+    const compact = wrapInProgram(showUPLC(program.body), program.version, false);
     const encoding = encodeProgram(program.body, program.version);
 
     return {
@@ -176,4 +185,48 @@ export function wrapBytesAsCbor(bytes: Uint8Array): Uint8Array {
 
 export function versionToString(version: UPLCVersion): string {
   return version.toString();
+}
+
+function isLikelyHex(source: string): boolean {
+  const trimmed = source.trim();
+  if (!trimmed) {
+    return false;
+  }
+
+  const withoutPrefix = trimmed.startsWith("0x") || trimmed.startsWith("0X") ? trimmed.slice(2) : trimmed;
+  const compact = withoutPrefix.replace(/\s+/g, "");
+  if (!compact) {
+    return false;
+  }
+
+  return /^[0-9a-fA-F]+$/.test(compact);
+}
+
+export function detectSourceKind(input: string): SourceKind | null {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  try {
+    parseUPLCText(trimmed);
+    return "text";
+  } catch {
+    // Best-effort detection continues below.
+  }
+
+  if (isLikelyHex(trimmed)) {
+      if (trimmed.startsWith("5")){
+          return "cbor";
+      }
+      else if (trimmed.startsWith("0")) {
+          return "flat";
+      }
+  }
+
+  if (trimmed.startsWith("(")) {
+    return "text";
+  }
+
+  return null;
 }

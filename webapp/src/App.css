@@ -56,6 +56,15 @@ textarea:focus {
   flex-wrap: wrap;
 }
 
+.detected-kind {
+  margin-top: 0.85rem;
+  font-size: 0.92rem;
+  color: #4a5a78;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 button {
   border: none;
   border-radius: 12px;
@@ -136,6 +145,16 @@ button:disabled {
   text-transform: uppercase;
   font-size: 0.8rem;
   letter-spacing: 0.05em;
+}
+
+.badge-text {
+  background: #ecfeff;
+  color: #0f766e;
+}
+
+.badge-cbor {
+  background: #f1f7ff;
+  color: #1d4ed8;
 }
 
 .meta .version,

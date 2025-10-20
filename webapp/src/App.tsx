@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import "./App.css";
-import { encodeProgram, parseCborHex, parseTextSource, versionToString } from "./lib/uplcUtils";
-
-type SourceKind = "text" | "cbor";
+import { detectSourceKind, encodeProgram, parseCborHex, parseTextSource, versionToString } from "./lib/uplcUtils";
+import type { SourceKind } from "./lib/uplcUtils";
 
 interface ViewerResult {
   kind: SourceKind;
@@ -25,6 +24,7 @@ function App() {
   const [prettyMode, setPrettyMode] = useState(false);
 
   const hasContent = input.trim().length > 0;
+  const detectedKind = useMemo(() => detectSourceKind(input), [input]);
 
   const placeholder = useMemo(
     () =>
@@ -125,7 +125,12 @@ function App() {
       </header>
 
       <section className="input-section">
-        <label htmlFor="uplc-input">Input</label>
+        <label htmlFor="uplc-input">Input&nbsp;&nbsp;
+            {hasContent && <span className={`badge ${detectedKind === "text" ? "badge-text" : "badge-cbor"}`}>
+              {detectedKind === "text" ? "UPLC text" : detectedKind === "flat" ? "Flat" : "CBOR hex"}
+            </span>
+            }
+        </label>
         <textarea
           id="uplc-input"
           value={input}
@@ -158,7 +163,7 @@ function App() {
 
           <div className="output-block">
             <div className="output-header">
-              <h2>Pretty UPLC</h2>
+              <h2>UPLC</h2>
               <label className="toggle">
                 <input
                   type="checkbox"
@@ -167,6 +172,9 @@ function App() {
                 />
                 <span>Pretty-print</span>
               </label>
+            <button type="button" onClick={() => handleCopy(prettyMode ? result.pretty : result.compact)}>
+                Copy
+            </button>
             </div>
             <pre className={prettyMode ? "pretty" : "compact"}>
               {prettyMode ? result.pretty : result.compact}
