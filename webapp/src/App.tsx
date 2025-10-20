@@ -121,7 +121,11 @@ function App() {
         <h1>UPLC Viewer</h1>
         <p>
           Format Untyped Plutus Core or inspect its CBOR-wrapped variant in the browser—no backend
-          required.
+          required. Explore more tooling at {" "}
+          <a href="https://opshin.dev" target="_blank" rel="noreferrer">
+            opshin.dev
+          </a>
+          .
         </p>
       </header>
 
