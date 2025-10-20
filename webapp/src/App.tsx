@@ -161,6 +161,27 @@ function App() {
             </span>
           </div>
 
+
+            <div className="output-block">
+                <div className="output-header">
+                    <h2>Flat Encoding (hex)</h2>
+                    <button type="button" onClick={() => handleCopy(result.flatHex)}>
+                        Copy
+                    </button>
+                </div>
+                <textarea value={result.flatHex} readOnly spellCheck={false} />
+            </div>
+
+            <div className="output-block">
+                <div className="output-header">
+                    <h2>CBOR-wrapped (hex)</h2>
+                    <button type="button" onClick={() => handleCopy(result.cborHex)}>
+                        Copy
+                    </button>
+                </div>
+                <textarea value={result.cborHex} readOnly spellCheck={false} />
+            </div>
+
           <div className="output-block">
             <div className="output-header">
               <h2>UPLC</h2>
@@ -179,26 +200,6 @@ function App() {
             <pre className={prettyMode ? "pretty" : "compact"}>
               {prettyMode ? result.pretty : result.compact}
             </pre>
-          </div>
-
-          <div className="output-block">
-            <div className="output-header">
-              <h2>Flat Encoding (hex)</h2>
-              <button type="button" onClick={() => handleCopy(result.flatHex)}>
-                Copy
-              </button>
-            </div>
-            <textarea value={result.flatHex} readOnly spellCheck={false} />
-          </div>
-
-          <div className="output-block">
-            <div className="output-header">
-              <h2>CBOR-wrapped (hex)</h2>
-              <button type="button" onClick={() => handleCopy(result.cborHex)}>
-                Copy
-              </button>
-            </div>
-            <textarea value={result.cborHex} readOnly spellCheck={false} />
           </div>
         </section>
       )}
