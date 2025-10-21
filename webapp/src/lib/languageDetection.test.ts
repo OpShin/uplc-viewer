@@ -15,6 +15,7 @@ interface TestCase {
 const EXPECTED_LANGUAGES: Record<string, DetectedLanguage | null> = {
   aiken: "aiken",
   plutarch: null,
+  "plu-ts": null,
   opshin: "opshin",
   "plutus-tx": "plutus-tx",
   marlowe: "marlowe",

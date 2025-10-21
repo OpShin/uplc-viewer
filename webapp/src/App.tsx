@@ -248,9 +248,15 @@ function App() {
 
       <footer>
         <p>
-            Built by the <a href="https://opshin.dev" target="_blank" rel="noreferrer"><code>OpShin</code></a> team. Powered by <a href="https://github.com/HarmonicLabs/uplc"><code>@harmoniclabs/uplc</code></a>.
-          Compile Python to UPLC at the <a href="https://playground.opshin.dev" target="_blank" rel="noreferrer">OpShin Playground</a>.
-      </p>
+          Built by the <a href="https://opshin.dev" target="_blank" rel="noreferrer"><code>OpShin</code></a> team. Powered by{" "}
+          <a href="https://github.com/HarmonicLabs/uplc" target="_blank" rel="noreferrer"><code>@harmoniclabs/uplc</code></a>.{" "}
+          Compile Python to UPLC at the <a href="https://playground.opshin.dev" target="_blank" rel="noreferrer">OpShin Playground</a>.{" "}
+          Source on{" "}
+          <a href="https://github.com/OpShin/uplc-viewer" target="_blank" rel="noreferrer">
+            GitHub
+          </a>
+          .
+        </p>
       </footer>
     </div>
   );
