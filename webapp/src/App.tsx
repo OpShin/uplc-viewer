@@ -11,6 +11,7 @@ const LANGUAGE_LABELS: Record<DetectedLanguage, string> = {
   "plutus-tx": "Plutus Tx",
   plutarch: "Plutarch",
   opshin: "OpShin",
+  marlowe: "Marlowe",
 };
 
 function describeLanguageEvidence(prediction: LanguagePrediction): string {
@@ -26,13 +27,8 @@ function describeLanguageEvidence(prediction: LanguagePrediction): string {
   return prediction.evidence.detail;
 }
 
-function buildLastActionMessage(base: string, prediction: LanguagePrediction | null): string {
-  if (!prediction) {
-    return base;
-  }
-
-  const label = LANGUAGE_LABELS[prediction.language];
-  return `${base} Likely language: ${label}.`;
+function buildLastActionMessage(base: string): string {
+   return base;
 }
 
 interface ViewerResult {
@@ -112,7 +108,7 @@ function App() {
         cborLength: encoding.cborBytes.length,
         languagePrediction,
       });
-      setLastAction(buildLastActionMessage("Parsed source as plain UPLC.", languagePrediction));
+      setLastAction(buildLastActionMessage("Parsed source as plain UPLC."));
       return;
     } catch (err) {
       textError = err instanceof Error ? err.message : String(err);

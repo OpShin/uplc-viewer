@@ -9,7 +9,7 @@ import {
   type UPLCTerm,
 } from "@harmoniclabs/uplc";
 
-export type DetectedLanguage = "aiken" | "plutarch" | "opshin" | "plutus-tx" | "plu-ts" | "helios";
+export type DetectedLanguage = "aiken" | "plutarch" | "opshin" | "plutus-tx" | "plu-ts" | "helios" | "marlowe";
 
 export interface MarkerEvidence {
   kind: "marker";
@@ -136,6 +136,12 @@ const plutusTxMarkers: readonly string[] = [
   "41756374696f6e457363726f7",
 ] as const;
 
+// obtained by manually inspecting contracts listed in https://github.com/StricaHQ/cardano-contracts-registry/blob/master/projects/Marlowe.json
+const marloweMarkers: readonly string[] = [
+    "fcb8885eb5e4f9a5cfca3c75e8c7280e482af32dcdf2d13e47d05d27",
+    "fdade3b86107bc715037b468574dd8d3f884a0da8c9956086b9a1a51",
+] as const;
+
 export function predictLanguage(term: UPLCTerm, programText: string): LanguagePrediction | null {
   const normalized = normalizeProgram(programText);
 
@@ -163,15 +169,21 @@ export function predictLanguage(term: UPLCTerm, programText: string): LanguagePr
     return { language: "helios", evidence: heliosEvidence };
   }
 
+  const opshinEvidence = collectMarkerEvidence(normalized, opshinMarkers);
+  if (opshinEvidence) {
+      return { language: "opshin", evidence: opshinEvidence };
+  }
+
+  const marloweEvidence = collectMarkerEvidence(normalized, marloweMarkers);
+  if (marloweEvidence) {
+      return {language: "marlowe", evidence: marloweEvidence};
+  }
+
   const plutusTxEvidence = collectMarkerEvidence(normalized, plutusTxMarkers);
   if (plutusTxEvidence) {
     return { language: "plutus-tx", evidence: plutusTxEvidence };
   }
 
-  const opshinEvidence = collectMarkerEvidence(normalized, opshinMarkers);
-  if (opshinEvidence) {
-    return { language: "opshin", evidence: opshinEvidence };
-  }
 
   const plutarchEvidence = collectMarkerEvidence(normalized, plutarchMarkers);
   if (plutarchEvidence) {
