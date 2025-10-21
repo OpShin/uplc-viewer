@@ -56,6 +56,30 @@ textarea:focus {
   flex-wrap: wrap;
 }
 
+.controls select {
+  border: 1px solid #d8def0;
+  border-radius: 12px;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2f3e93;
+  background: #f7f9ff;
+  min-width: 220px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.controls select:focus {
+  outline: none;
+  border-color: #647cfb;
+  box-shadow: 0 0 0 4px rgba(100, 124, 251, 0.14);
+  background: #f0f4ff;
+}
+
+.controls select:hover {
+  background: #eef2ff;
+}
+
 .detected-kind {
   margin-top: 0.85rem;
   font-size: 0.92rem;

@@ -1,8 +1,10 @@
 import { useId, useMemo, useState } from "react";
+import type { ChangeEvent } from "react";
 import "./App.css";
 import { detectSourceKind, encodeProgram, parseCborHex, parseTextSource, versionToString } from "./lib/uplcUtils";
 import { predictLanguage, type DetectedLanguage, type LanguagePrediction } from "./lib/languageDetection";
 import type { SourceKind } from "./lib/uplcUtils";
+import { TEST_CASE_EXAMPLES } from "./lib/examples";
 
 const LANGUAGE_LABELS: Record<DetectedLanguage, string> = {
   aiken: "Aiken",
@@ -51,6 +53,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [lastAction, setLastAction] = useState<string | null>(null);
   const [prettyMode, setPrettyMode] = useState(false);
+  const [selectedExampleId, setSelectedExampleId] = useState<string>("");
 
   const hasContent = input.trim().length > 0;
   const detectedKind = useMemo(() => detectSourceKind(input), [input]);
@@ -77,6 +80,7 @@ function App() {
     setError(null);
     setLastAction(null);
     setPrettyMode(false);
+    setSelectedExampleId("");
   };
 
   const handleProcess = () => {
@@ -148,6 +152,26 @@ function App() {
     }
   };
 
+  const handleExampleSelect = (event: ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    if (!value) {
+      return;
+    }
+
+    const example = TEST_CASE_EXAMPLES.find((item) => item.id === value);
+    setSelectedExampleId("");
+
+    if (!example) {
+      return;
+    }
+
+    setInput(example.hex);
+    setResult(EMPTY_RESULT);
+    setError(null);
+    setPrettyMode(false);
+    setLastAction(`Loaded ${example.label} from tests.`);
+  };
+
   const currentLanguagePrediction = result?.languagePrediction ?? null;
   const languageBadgeLabel = currentLanguagePrediction ? LANGUAGE_LABELS[currentLanguagePrediction.language] : null;
   const languageEvidence = currentLanguagePrediction ? describeLanguageEvidence(currentLanguagePrediction) : null;
@@ -183,6 +207,18 @@ function App() {
           <button type="button" onClick={handleClear} disabled={!hasContent && !result}>
             Clear
           </button>
+            <select
+                value={selectedExampleId}
+                onChange={handleExampleSelect}
+                aria-label="Load example program from tests"
+            >
+                <option value="">Load example from tests…</option>
+                {TEST_CASE_EXAMPLES.map((example) => (
+                    <option key={example.id} value={example.id}>
+                        {example.label}
+                    </option>
+                ))}
+            </select>
         </div>
         {error && <p className="alert alert-error">{error}</p>}
         {lastAction && !error && <p className="alert alert-info">{lastAction}</p>}
