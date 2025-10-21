@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import "./App.css";
 import { detectSourceKind, encodeProgram, parseCborHex, parseTextSource, versionToString } from "./lib/uplcUtils";
 import { predictLanguage, type DetectedLanguage, type LanguagePrediction } from "./lib/languageDetection";
@@ -150,7 +150,8 @@ function App() {
 
   const currentLanguagePrediction = result?.languagePrediction ?? null;
   const languageBadgeLabel = currentLanguagePrediction ? LANGUAGE_LABELS[currentLanguagePrediction.language] : null;
-  const languageBadgeTitle = currentLanguagePrediction ? describeLanguageEvidence(currentLanguagePrediction) : undefined;
+  const languageEvidence = currentLanguagePrediction ? describeLanguageEvidence(currentLanguagePrediction) : null;
+  const languageTooltipId = useId();
 
   return (
     <div className="app-shell">
@@ -196,9 +197,21 @@ function App() {
               Flat bytes: {result.flatLength.toLocaleString()} · CBOR bytes:{" "}
               {result.cborLength.toLocaleString()}
             </span>
-            {languageBadgeLabel && (
-              <span className="badge badge-language" title={languageBadgeTitle}>
-                Likely {languageBadgeLabel}
+            {languageBadgeLabel && languageEvidence && (
+              <span
+                className="language-badge"
+                tabIndex={0}
+                aria-describedby={languageTooltipId}
+              >
+                <span className="badge badge-language">
+                  Likely {languageBadgeLabel}
+                  <span className="badge-help" aria-hidden="true">
+                    ?
+                  </span>
+                </span>
+                <span className="language-tooltip" role="tooltip" id={languageTooltipId}>
+                  {languageEvidence}
+                </span>
               </span>
             )}
           </div>

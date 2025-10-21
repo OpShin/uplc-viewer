@@ -282,7 +282,7 @@ function extractOpshinSignature(normalizedProgram: string): string | null {
     }
 
     const versionLabel = version.join(".");
-    return `opshin v${versionLabel}`;
+    return `#6f${hex} - opshin v${versionLabel}`;
   }
 
   return null;
