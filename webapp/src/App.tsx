@@ -1,7 +1,39 @@
 import { useMemo, useState } from "react";
 import "./App.css";
 import { detectSourceKind, encodeProgram, parseCborHex, parseTextSource, versionToString } from "./lib/uplcUtils";
+import { predictLanguage, type DetectedLanguage, type LanguagePrediction } from "./lib/languageDetection";
 import type { SourceKind } from "./lib/uplcUtils";
+
+const LANGUAGE_LABELS: Record<DetectedLanguage, string> = {
+  aiken: "Aiken",
+  helios: "Helios",
+  "plu-ts": "Plu-ts",
+  "plutus-tx": "Plutus Tx",
+  plutarch: "Plutarch",
+  opshin: "OpShin",
+};
+
+function describeLanguageEvidence(prediction: LanguagePrediction): string {
+  if (prediction.evidence.kind === "marker") {
+    const { totalMatches, markers } = prediction.evidence;
+    const sample = markers.join(", ");
+    if (totalMatches > markers.length) {
+      return `Matched ${totalMatches} known marker snippets (e.g. ${sample}).`;
+    }
+    return `Matched marker snippets: ${sample}.`;
+  }
+
+  return prediction.evidence.detail;
+}
+
+function buildLastActionMessage(base: string, prediction: LanguagePrediction | null): string {
+  if (!prediction) {
+    return base;
+  }
+
+  const label = LANGUAGE_LABELS[prediction.language];
+  return `${base} Likely language: ${label}.`;
+}
 
 interface ViewerResult {
   kind: SourceKind;
@@ -12,6 +44,7 @@ interface ViewerResult {
   flatLength: number;
   cborHex: string;
   cborLength: number;
+  languagePrediction: LanguagePrediction | null;
 }
 
 const EMPTY_RESULT: ViewerResult | null = null;
@@ -66,6 +99,7 @@ function App() {
     try {
       const parsed = parseTextSource(trimmed);
       const encoding = encodeProgram(parsed.term, parsed.version);
+      const languagePrediction = predictLanguage(parsed.term, parsed.compact);
 
       setResult({
         kind: "text",
@@ -76,8 +110,9 @@ function App() {
         flatLength: encoding.flatBytes.length,
         cborHex: encoding.cborHex,
         cborLength: encoding.cborBytes.length,
+        languagePrediction,
       });
-      setLastAction("Parsed source as plain UPLC.");
+      setLastAction(buildLastActionMessage("Parsed source as plain UPLC.", languagePrediction));
       return;
     } catch (err) {
       textError = err instanceof Error ? err.message : String(err);
@@ -85,6 +120,7 @@ function App() {
 
     try {
       const parsed = parseCborHex(trimmed);
+      const languagePrediction = predictLanguage(parsed.program.body, parsed.compact);
       setResult({
         kind: "cbor",
         version: versionToString(parsed.version),
@@ -94,8 +130,9 @@ function App() {
         flatLength: parsed.flatBytes.length,
         cborHex: parsed.cborHex,
         cborLength: parsed.cborBytes.length,
+        languagePrediction,
       });
-      setLastAction("Parsed source as CBOR-wrapped script.");
+      setLastAction(buildLastActionMessage("Parsed source as CBOR-wrapped script.", languagePrediction));
     } catch (err) {
       const cborMessage = err instanceof Error ? err.message : String(err);
       const combined = [
@@ -114,6 +151,10 @@ function App() {
       setLastAction("Copy failed—please copy manually.");
     }
   };
+
+  const currentLanguagePrediction = result?.languagePrediction ?? null;
+  const languageBadgeLabel = currentLanguagePrediction ? LANGUAGE_LABELS[currentLanguagePrediction.language] : null;
+  const languageBadgeTitle = currentLanguagePrediction ? describeLanguageEvidence(currentLanguagePrediction) : undefined;
 
   return (
     <div className="app-shell">
@@ -159,6 +200,11 @@ function App() {
               Flat bytes: {result.flatLength.toLocaleString()} · CBOR bytes:{" "}
               {result.cborLength.toLocaleString()}
             </span>
+            {languageBadgeLabel && (
+              <span className="badge badge-language" title={languageBadgeTitle}>
+                Likely {languageBadgeLabel}
+              </span>
+            )}
           </div>
 
 

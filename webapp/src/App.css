@@ -157,6 +157,11 @@ button:disabled {
   color: #1d4ed8;
 }
 
+.badge-language {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 .meta .version,
 .meta .length {
   padding: 0.3rem 0.75rem;
