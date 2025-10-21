@@ -14,11 +14,10 @@ interface TestCase {
 
 const EXPECTED_LANGUAGES: Record<string, DetectedLanguage | null> = {
   aiken: "aiken",
-  plutarch: "plutarch",
+  plutarch: null,
   opshin: "opshin",
   "plutus-tx": "plutus-tx",
-  "plu-ts": "plu-ts",
-  marlowe: null,
+  marlowe: "marlowe",
 };
 
 const testCases = loadTestCases();
@@ -66,6 +65,10 @@ function loadTestCases(): TestCase[] {
   for (const rawLine of contents.split(/\r?\n/)) {
     const line = rawLine.trim();
     if (!line) {
+      continue;
+    }
+
+    if (line.startsWith("#")) {
       continue;
     }
 

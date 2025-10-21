@@ -169,9 +169,9 @@ export function predictLanguage(term: UPLCTerm, programText: string): LanguagePr
     return { language: "helios", evidence: heliosEvidence };
   }
 
-  const opshinEvidence = collectMarkerEvidence(normalized, opshinMarkers);
+  const opshinEvidence = collectOpshinEvidence(normalized);
   if (opshinEvidence) {
-      return { language: "opshin", evidence: opshinEvidence };
+    return { language: "opshin", evidence: opshinEvidence };
   }
 
   const marloweEvidence = collectMarkerEvidence(normalized, marloweMarkers);
@@ -228,6 +228,64 @@ function collectMarkerEvidence(
     markers: samples,
     totalMatches,
   };
+}
+
+function collectOpshinEvidence(normalizedProgram: string): MarkerEvidence | null {
+  const textualEvidence = collectMarkerEvidence(normalizedProgram, opshinMarkers);
+  const signatureMarker = extractOpshinSignature(normalizedProgram);
+
+  if (!textualEvidence && !signatureMarker) {
+    return null;
+  }
+
+  const markers = [...(textualEvidence?.markers ?? [])];
+  let totalMatches = textualEvidence?.totalMatches ?? 0;
+
+  if (signatureMarker) {
+    totalMatches += 1;
+    if (markers.length < MARKER_SAMPLE_LIMIT) {
+      markers.push(signatureMarker);
+    }
+  }
+
+  return {
+    kind: "marker",
+    markers,
+    totalMatches,
+  };
+}
+
+function extractOpshinSignature(normalizedProgram: string): string | null {
+  const regex = /conbytestring#6f([0-9a-f]{6})/gi;
+  for (const match of normalizedProgram.matchAll(regex)) {
+    const [, hex] = match;
+    if (!hex) {
+      continue;
+    }
+
+    if (hex.length % 2 !== 0) {
+      continue;
+    }
+
+    const bytes = new Uint8Array(hex.length / 2);
+    for (let index = 0; index < bytes.length; index += 1) {
+      bytes[index] = Number.parseInt(hex.slice(index * 2, index * 2 + 2), 16);
+    }
+
+    if (!bytes.length) {
+      continue;
+    }
+
+    const version = Array.from(bytes);
+    if (!version.length) {
+      continue;
+    }
+
+    const versionLabel = version.join(".");
+    return `opshin v${versionLabel}`;
+  }
+
+  return null;
 }
 
 function isPlutsTerm(term: UPLCTerm): boolean {
