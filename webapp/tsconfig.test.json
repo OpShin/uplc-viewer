@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./.test-dist",
+    "declaration": false,
+    "emitDeclarationOnly": false,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "allowImportingTsExtensions": false,
+    "sourceMap": false,
+    "rootDir": "./"
+  },
+  "include": [
+    "src/lib/languageDetection.ts",
+    "src/lib/uplcUtils.ts",
+    "src/lib/languageDetection.test.ts"
+  ]
+}
