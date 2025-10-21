@@ -128,7 +128,7 @@ function App() {
         cborLength: parsed.cborBytes.length,
         languagePrediction,
       });
-      setLastAction(buildLastActionMessage("Parsed source as CBOR-wrapped script.", languagePrediction));
+      setLastAction(buildLastActionMessage("Parsed source as CBOR-wrapped script."));
     } catch (err) {
       const cborMessage = err instanceof Error ? err.message : String(err);
       const combined = [
