@@ -211,6 +211,19 @@ button:disabled {
   font-size: 0.7rem;
   font-weight: 700;
 }
+.badge-help-unknown {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 999px;
+    background: #f1f7ff;
+    border: 1px solid #1d4ed8;
+    color: #1d4ed8;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
 
 .language-tooltip {
   position: absolute;

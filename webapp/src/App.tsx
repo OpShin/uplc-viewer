@@ -250,6 +250,23 @@ function App() {
                 </span>
               </span>
             )}
+              {!languageBadgeLabel && (
+                  <span
+                      className="language-badge"
+                      tabIndex={0}
+                      aria-describedby={languageTooltipId}
+                  >
+                <span className="version">
+                  Language unknown{" "}
+                    <span className="badge-help-unknown" aria-hidden="true">
+                    ?
+                  </span>
+                </span>
+                <span className="language-tooltip" role="tooltip" id={languageTooltipId}>
+                    Could not identify the smart contract language based on unique markers
+                </span>
+              </span>
+              )}
           </div>
 
 
