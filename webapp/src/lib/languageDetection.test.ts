@@ -57,32 +57,68 @@ testCases.forEach(({ label, hex }, index) => {
 
 function loadTestCases(): TestCase[] {
   const currentDir = dirname(fileURLToPath(import.meta.url));
-  const testsPath = resolve(currentDir, "../../../../tests");
-  const contents = readFileSync(testsPath, "utf8").trim();
+  const candidatePaths = [
+    resolve(currentDir, "./languageDetection.test.yml"),
+    resolve(currentDir, "../../..", "src", "lib", "languageDetection.test.yml"),
+  ];
+
+  let contents: string | null = null;
+  for (const candidate of candidatePaths) {
+    try {
+      contents = readFileSync(candidate, "utf8");
+      break;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+        throw error;
+      }
+    }
+  }
+
+  if (contents === null) {
+    throw new Error("Malformed tests file: could not locate fixtures.");
+  }
 
   const cases: TestCase[] = [];
   let currentLabel: string | null = null;
 
   for (const rawLine of contents.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line) {
+    const trimmed = rawLine.trim();
+    if (!trimmed || trimmed.startsWith("#")) {
       continue;
     }
 
-    if (line.startsWith("#")) {
+    if (!rawLine.startsWith(" ")) {
+      if (!trimmed.endsWith(":")) {
+        throw new Error(
+          `Malformed tests file: expected label definition but found "${rawLine}".`,
+        );
+      }
+      currentLabel = trimmed.slice(0, -1);
       continue;
     }
 
-    if (line.endsWith(":")) {
-      currentLabel = line.slice(0, -1);
-      continue;
+    if (!trimmed.startsWith("- ")) {
+      throw new Error(
+        `Malformed tests file: expected list entry but found "${rawLine}".`,
+      );
     }
 
     if (!currentLabel) {
-      throw new Error("Malformed tests file: encountered data line before label.");
+      throw new Error("Malformed tests file: encountered value before label.");
     }
 
-    cases.push({ label: currentLabel, hex: line });
+    const hex = trimmed.slice(2).trim();
+    if (!hex) {
+      throw new Error(
+        `Malformed tests file: empty hex value for label "${currentLabel}".`,
+      );
+    }
+
+    cases.push({ label: currentLabel, hex });
+  }
+
+  if (cases.length === 0) {
+    throw new Error("Malformed tests file: no test cases loaded.");
   }
 
   return cases;
