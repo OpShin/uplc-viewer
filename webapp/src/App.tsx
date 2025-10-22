@@ -210,9 +210,9 @@ function App() {
             <select
                 value={selectedExampleId}
                 onChange={handleExampleSelect}
-                aria-label="Load example program from tests"
+                aria-label="Load example program"
             >
-                <option value="">Load example from tests…</option>
+                <option value="">Load example</option>
                 {TEST_CASE_EXAMPLES.map((example) => (
                     <option key={example.id} value={example.id}>
                         {example.label}
